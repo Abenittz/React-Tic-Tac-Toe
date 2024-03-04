@@ -11,23 +11,19 @@ function Square({ value, onsqClick }) {
   );
 }
 
-export default function Board() {
-  const [isNext, setisNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill(null));
-
+function Board({ isNext, squares, onPlay }) {
   function handleClick(i) {
-    const nextSquare = squares.slice();
-
-    if (squares[i] || calculateWinner(squares)) {
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
+    const nextSquare = squares.slice();
+
     if (isNext) {
       nextSquare[i] = "O";
     } else {
       nextSquare[i] = "X";
     }
-    setSquares(nextSquare);
-    setisNext(!isNext);
+    onPlay(nextSquare);
   }
 
   const Winner = calculateWinner(squares);
@@ -40,22 +36,43 @@ export default function Board() {
 
   return (
     <>
+      <div className="font-bold mb-2">{status}</div>
+
+      <div className="flex items-center">
+        <Square value={squares[0]} onsqClick={() => handleClick(0)} />
+        <Square value={squares[1]} onsqClick={() => handleClick(1)} />
+        <Square value={squares[2]} onsqClick={() => handleClick(2)} />
+      </div>
+      <div className="flex items-center">
+        <Square value={squares[3]} onsqClick={() => handleClick(3)} />
+        <Square value={squares[4]} onsqClick={() => handleClick(4)} />
+        <Square value={squares[5]} onsqClick={() => handleClick(5)} />
+      </div>
+      <div className="flex items-center">
+        <Square value={squares[6]} onsqClick={() => handleClick(6)} />
+        <Square value={squares[7]} onsqClick={() => handleClick(7)} />
+        <Square value={squares[8]} onsqClick={() => handleClick(8)} />
+      </div>
+    </>
+  );
+}
+
+export default function Game() {
+  const [isNext, setIsNext] = useState(true);
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const currentSquare = history[history.length - 1];
+
+  function handlePlay(nextSquare) {
+    setHistory([...history, nextSquare]);
+    setIsNext(!isNext);
+  }
+  return (
+    <>
       <div className="flex justify-center items-center flex-col h-screen">
-        <div className="flex items-center">
-          <Square value={squares[0]} onsqClick={() => handleClick(0)} />
-          <Square value={squares[1]} onsqClick={() => handleClick(1)} />
-          <Square value={squares[2]} onsqClick={() => handleClick(2)} />
-        </div>
-        <div className="flex items-center">
-          <Square value={squares[3]} onsqClick={() => handleClick(3)} />
-          <Square value={squares[4]} onsqClick={() => handleClick(4)} />
-          <Square value={squares[5]} onsqClick={() => handleClick(5)} />
-        </div>
-        <div className="flex items-center">
-          <Square value={squares[6]} onsqClick={() => handleClick(6)} />
-          <Square value={squares[7]} onsqClick={() => handleClick(7)} />
-          <Square value={squares[8]} onsqClick={() => handleClick(8)} />
-        </div>
+        <Board isNext={isNext} squares={currentSquare} onPlay={handlePlay} />
+      </div>
+      <div>
+        <ol> </ol>
       </div>
     </>
   );
