@@ -36,43 +36,72 @@ function Board({ isNext, squares, onPlay }) {
 
   return (
     <>
-      <div className="font-bold mb-2">{status}</div>
+      <div className="flex justify-center items-center flex-col h-screen">
+        <div className="font-bold mb-2">{status}</div>
 
-      <div className="flex items-center">
-        <Square value={squares[0]} onsqClick={() => handleClick(0)} />
-        <Square value={squares[1]} onsqClick={() => handleClick(1)} />
-        <Square value={squares[2]} onsqClick={() => handleClick(2)} />
-      </div>
-      <div className="flex items-center">
-        <Square value={squares[3]} onsqClick={() => handleClick(3)} />
-        <Square value={squares[4]} onsqClick={() => handleClick(4)} />
-        <Square value={squares[5]} onsqClick={() => handleClick(5)} />
-      </div>
-      <div className="flex items-center">
-        <Square value={squares[6]} onsqClick={() => handleClick(6)} />
-        <Square value={squares[7]} onsqClick={() => handleClick(7)} />
-        <Square value={squares[8]} onsqClick={() => handleClick(8)} />
+        <div className="flex items-center">
+          <Square value={squares[0]} onsqClick={() => handleClick(0)} />
+          <Square value={squares[1]} onsqClick={() => handleClick(1)} />
+          <Square value={squares[2]} onsqClick={() => handleClick(2)} />
+        </div>
+        <div className="flex items-center">
+          <Square value={squares[3]} onsqClick={() => handleClick(3)} />
+          <Square value={squares[4]} onsqClick={() => handleClick(4)} />
+          <Square value={squares[5]} onsqClick={() => handleClick(5)} />
+        </div>
+        <div className="flex items-center">
+          <Square value={squares[6]} onsqClick={() => handleClick(6)} />
+          <Square value={squares[7]} onsqClick={() => handleClick(7)} />
+          <Square value={squares[8]} onsqClick={() => handleClick(8)} />
+        </div>
       </div>
     </>
   );
 }
 
 export default function Game() {
-  const [isNext, setIsNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquare = history[history.length - 1];
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquare = history[currentMove];
+  const isNext = currentMove % 2 === 0;
 
   function handlePlay(nextSquare) {
-    setHistory([...history, nextSquare]);
-    setIsNext(!isNext);
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquare];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
   }
+
+  function JumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
+
+  const moves = history.map((squares, move) => {
+    let discription;
+    if (move > 0) {
+      discription = "go to move #" + move;
+    } else {
+      discription = "go to start";
+    }
+
+    return (
+      <li key="{move}">
+        <button
+          onClick={() => JumpTo(move)}
+          className="border border-black rounded bg-slate-200"
+        >
+          {discription}
+        </button>
+      </li>
+    );
+  });
+
   return (
     <>
-      <div className="flex justify-center items-center flex-col h-screen">
+      <div className="flex justify-center items-center flex-row h-screen">
         <Board isNext={isNext} squares={currentSquare} onPlay={handlePlay} />
-      </div>
-      <div>
-        <ol> </ol>
+        <div>
+          <ol>{moves}</ol>
+        </div>
       </div>
     </>
   );
